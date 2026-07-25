@@ -172,6 +172,25 @@ export function TerminalPane({ id, isVisible }: { id: string; isVisible: boolean
         }
       }).catch(() => { /* listener registration failed; ignore */ });
 
+      // Shift+Enter → kitty CSI u (OpenCode/docs: \x1b[13;2u). Must block
+      // keydown+keypress+keyup — returning false only on keydown leaves
+      // keypress free to still emit CR and submit.
+      term.attachCustomKeyEventHandler((ev) => {
+        if (
+          ev.key === 'Enter' &&
+          ev.shiftKey &&
+          !ev.ctrlKey &&
+          !ev.altKey &&
+          !ev.metaKey
+        ) {
+          if (ev.type === 'keydown') {
+            term.input('\x1b[13;2u');
+          }
+          return false;
+        }
+        return true;
+      });
+
       // Send data to Rust PTY
       term.onData((data) => {
         // Convert DEL (0x7f) backspace to BS (0x08) for shell compatibility
