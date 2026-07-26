@@ -1,40 +1,77 @@
 * {
   box-sizing: border-box;
 }
+
+:root {
+  /* Defaults = Tux Dark (overridden at runtime by applyTheme) */
+  --bg-app: #1e1e1e;
+  --bg-sidebar: #181818;
+  --bg-header: #252526;
+  --bg-elevated: #2a2a2a;
+  --bg-hover: #2a2d2e;
+  --border: #333333;
+  --border-strong: #3c3c3c;
+  --fg: #d4d4d4;
+  --fg-muted: #888888;
+  --fg-dim: #666666;
+  --fg-faint: #555555;
+  --fg-bright: #ffffff;
+  --accent: #5865f2;
+  --accent-hover: #4752c4;
+  --danger: #a12628;
+  --danger-hover: #c4353a;
+  --warn: #f3c03c;
+  --running: #f5a623;
+  --git-add: #73c991;
+  --git-mod: #e2c08d;
+  --git-del: #f14c4c;
+  --folder: #dcb67a;
+  --diff-add: #2ea043;
+  --diff-add-bg: rgba(46, 160, 67, 0.15);
+  --diff-del: #f85149;
+  --diff-del-bg: rgba(248, 81, 73, 0.15);
+  --diff-header: #7ee787;
+  --term-bg: #1e1e1e;
+  --term-fg: #d4d4d4;
+  --term-cursor: #d4d4d4;
+  --term-cursor-accent: #1e1e1e;
+  --term-selection: rgba(88, 101, 242, 0.4);
+  --btn-primary: #0e639c;
+  --btn-primary-hover: #1177bb;
+
+  --diff-background-color: var(--bg-app);
+  --diff-text-color: var(--fg);
+  --diff-font-family: ui-monospace, Consolas, monospace;
+  --diff-selection-background-color: rgba(56, 139, 253, 0.25);
+  --diff-selection-text-color: var(--fg);
+  --diff-gutter-insert-background-color: rgba(46, 160, 67, 0.2);
+  --diff-gutter-insert-text-color: var(--diff-add);
+  --diff-gutter-delete-background-color: rgba(248, 81, 73, 0.2);
+  --diff-gutter-delete-text-color: var(--diff-del);
+  --diff-gutter-selected-background-color: rgba(56, 139, 253, 0.15);
+  --diff-gutter-selected-text-color: var(--fg);
+  --diff-code-insert-background-color: var(--diff-add-bg);
+  --diff-code-insert-text-color: var(--diff-add);
+  --diff-code-delete-background-color: var(--diff-del-bg);
+  --diff-code-delete-text-color: var(--diff-del);
+  --diff-code-insert-edit-background-color: rgba(46, 160, 67, 0.4);
+  --diff-code-insert-edit-text-color: var(--diff-add);
+  --diff-code-delete-edit-background-color: rgba(248, 81, 73, 0.4);
+  --diff-code-delete-edit-text-color: var(--diff-del);
+  --diff-code-selected-background-color: rgba(56, 139, 253, 0.15);
+  --diff-code-selected-text-color: var(--fg);
+  --diff-omit-gutter-line-color: var(--diff-del);
+}
+
 body, html, #root {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #1e1e1e;
-  color: #fff;
+  background-color: var(--bg-app);
+  color: var(--fg-bright);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-:root {
-  --diff-background-color: #1e1e1e;
-  --diff-text-color: #d4d4d4;
-  --diff-font-family: ui-monospace, Consolas, monospace;
-  --diff-selection-background-color: rgba(56, 139, 253, 0.25);
-  --diff-selection-text-color: #d4d4d4;
-  --diff-gutter-insert-background-color: rgba(46, 160, 67, 0.2);
-  --diff-gutter-insert-text-color: #2ea043;
-  --diff-gutter-delete-background-color: rgba(248, 81, 73, 0.2);
-  --diff-gutter-delete-text-color: #f85149;
-  --diff-gutter-selected-background-color: rgba(56, 139, 253, 0.15);
-  --diff-gutter-selected-text-color: #d4d4d4;
-  --diff-code-insert-background-color: rgba(46, 160, 67, 0.15);
-  --diff-code-insert-text-color: #2ea043;
-  --diff-code-delete-background-color: rgba(248, 81, 73, 0.15);
-  --diff-code-delete-text-color: #f85149;
-  --diff-code-insert-edit-background-color: rgba(46, 160, 67, 0.4);
-  --diff-code-insert-edit-text-color: #2ea043;
-  --diff-code-delete-edit-background-color: rgba(248, 81, 73, 0.4);
-  --diff-code-delete-edit-text-color: #f85149;
-  --diff-code-selected-background-color: rgba(56, 139, 253, 0.15);
-  --diff-code-selected-text-color: #d4d4d4;
-  --diff-omit-gutter-line-color: #cb2a1d;
 }
 
 .diff {
@@ -67,20 +104,20 @@ body, html, #root {
 }
 
 .diff-dark .diff {
-  background-color: #1e1e1e !important;
+  background-color: var(--bg-app) !important;
 }
 
 .diff-dark .diff td {
-  color: #d4d4d4 !important;
+  color: var(--fg) !important;
   font-family: ui-monospace, Consolas, monospace !important;
 }
 
 .diff-dark .diff-code {
-  color: #d4d4d4 !important;
+  color: var(--fg) !important;
 }
 
 .diff-dark .diff-gutter {
-  color: #6e7681 !important;
+  color: var(--fg-muted) !important;
 }
 
 .diff-dark .diff-line {

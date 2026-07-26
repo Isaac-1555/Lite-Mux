@@ -6,13 +6,21 @@ import { TerminalPane } from './TerminalPane';
 import { EditorPane } from './EditorPane';
 import { DiffPane } from './DiffPane';
 import { Sidebar } from './Sidebar';
-import { KeymapSettings } from './KeymapSettings';
+import { SettingsModal } from './SettingsModal';
 import { loadOverrides, saveOverrides } from './keymapStorage';
 import {
   type KeymapOverride,
   effectiveKeymap,
   matchCombo,
 } from './keymap';
+import {
+  type ThemeState,
+  DEFAULT_THEME_ID,
+  applyTheme,
+  loadTheme,
+  saveTheme,
+  resolveColors,
+} from './theme';
 import type { FileNode, GitFileStatus, TerminalMeta } from './types';
 import './App.css';
 
@@ -45,6 +53,12 @@ function App() {
   const [keymapOverrides, setKeymapOverrides] = useState<KeymapOverride>({});
   const [keymapLoaded, setKeymapLoaded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [themeState, setThemeState] = useState<ThemeState>({
+    activeId: DEFAULT_THEME_ID,
+    custom: null,
+  });
+  const [themeLoaded, setThemeLoaded] = useState(false);
+  const themeColors = useMemo(() => resolveColors(themeState), [themeState]);
 
   const handleSplitMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -133,6 +147,29 @@ function App() {
     if (!keymapLoaded) return;
     saveOverrides(keymapOverrides).catch(() => {});
   }, [keymapOverrides, keymapLoaded]);
+
+  useEffect(() => {
+    loadTheme()
+      .then((s) => {
+        setThemeState(s);
+        applyTheme(resolveColors(s));
+        setThemeLoaded(true);
+      })
+      .catch(() => {
+        applyTheme(resolveColors({ activeId: DEFAULT_THEME_ID, custom: null }));
+        setThemeLoaded(true);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!themeLoaded) return;
+    applyTheme(themeColors);
+  }, [themeColors, themeLoaded]);
+
+  useEffect(() => {
+    if (!themeLoaded) return;
+    saveTheme(themeState).catch(() => {});
+  }, [themeState, themeLoaded]);
 
   // Listen for CWD changes + meta changes from backend
   useEffect(() => {
@@ -376,16 +413,18 @@ function App() {
 
   if (!loaded) {
     return (
-      <div style={{ color: '#fff', padding: '20px' }}>Loading workspace...</div>
+      <div style={{ color: 'var(--fg-bright)', padding: '20px' }}>Loading workspace...</div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: '#1e1e1e' }}>
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', backgroundColor: 'var(--bg-app)' }}>
       {showSettings && (
-        <KeymapSettings
+        <SettingsModal
           overrides={keymapOverrides}
-          onSave={setKeymapOverrides}
+          onSaveKeymap={setKeymapOverrides}
+          themeState={themeState}
+          onThemeChange={setThemeState}
           onClose={() => setShowSettings(false)}
         />
       )}
@@ -426,7 +465,7 @@ function App() {
             transition: 'width 0.1s ease',
           }}>
             {editorFile ? (
-              <EditorPane filePath={editorFile} onClose={closeEditor} />
+              <EditorPane filePath={editorFile} onClose={closeEditor} colors={themeColors} />
             ) : diffFile ? (
               <DiffPane filePath={diffFile} onClose={closeDiff} />
             ) : null}
@@ -441,7 +480,7 @@ function App() {
                 style={{
                   width: '5px',
                   cursor: 'col-resize',
-                  backgroundColor: '#252526',
+                  backgroundColor: 'var(--bg-header)',
                   flexShrink: 0,
                   position: 'relative',
                   zIndex: 10,
@@ -453,7 +492,7 @@ function App() {
                   bottom: 0,
                   left: '50%',
                   width: '1px',
-                  backgroundColor: '#333',
+                  backgroundColor: 'var(--border)',
                 }} />
               </div>
               
@@ -477,7 +516,7 @@ function App() {
               style={{
                 width: '5px',
                 cursor: 'col-resize',
-                backgroundColor: '#252526',
+                backgroundColor: 'var(--bg-header)',
                 flexShrink: 0,
                 position: 'relative',
                 zIndex: 10,
@@ -489,7 +528,7 @@ function App() {
                 bottom: 0,
                 left: '50%',
                 width: '1px',
-                backgroundColor: '#333',
+                backgroundColor: 'var(--border)',
               }} />
             </div>
           )}
@@ -510,7 +549,7 @@ function App() {
               >
                 <TerminalHeader id={t.id} index={idx} onRemove={removeTerminal} meta={terminalMeta[t.id]} />
                 <div style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                  <TerminalPane id={t.id} isVisible={t.id === activeTerminalId} />
+                  <TerminalPane id={t.id} isVisible={t.id === activeTerminalId} colors={themeColors} />
                 </div>
               </div>
             ))}
@@ -537,12 +576,12 @@ function TerminalHeader({ id, index, onRemove, meta }: { id: string; index: numb
   const running = !!meta?.currentCommand;
 
   return (
-    <div style={{ height: '30px', backgroundColor: '#252526', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: '12px', color: '#888', gap: '8px' }}>
+    <div style={{ height: '30px', backgroundColor: 'var(--bg-header)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: '12px', color: 'var(--fg-muted)', gap: '8px' }}>
       {running && (
-        <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f5a623', flexShrink: 0 }} title="Command running" />
+        <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--running)', flexShrink: 0 }} title="Command running" />
       )}
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</span>
-      <button onClick={() => onRemove(id)} style={{ marginLeft: 'auto', cursor: 'pointer', background: 'transparent', border: 'none', color: '#888', fontSize: '14px' }}>×</button>
+      <button onClick={() => onRemove(id)} style={{ marginLeft: 'auto', cursor: 'pointer', background: 'transparent', border: 'none', color: 'var(--fg-muted)', fontSize: '14px' }}>×</button>
     </div>
   );
 }

@@ -42,25 +42,23 @@ export function GitViewer({ path }: GitViewerProps) {
     return date.toLocaleDateString();
   };
 
-  if (loading) return <div style={{ padding: '20px', color: '#888' }}>Loading git...</div>;
+  if (loading) return <div style={{ padding: '20px', color: 'var(--fg-muted)' }}>Loading git...</div>;
 
   return (
     <div style={{ padding: '10px', overflowY: 'auto', height: '100%' }}>
-      {/* Branch */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', padding: '8px', backgroundColor: '#2a2a2a', borderRadius: '4px' }}>
-        <GitBranchIcon size={16} color="#73c991" />
-        <span style={{ color: '#d4d4d4', fontSize: '13px', fontWeight: 'bold' }}>{branch?.name || 'unknown'}</span>
-        <button onClick={loadGitData} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', color: '#888' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', padding: '8px', backgroundColor: 'var(--bg-elevated)', borderRadius: '4px' }}>
+        <GitBranchIcon size={16} color="var(--git-add)" />
+        <span style={{ color: 'var(--fg)', fontSize: '13px', fontWeight: 'bold' }}>{branch?.name || 'unknown'}</span>
+        <button onClick={loadGitData} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--fg-muted)' }}>
           <RefreshCw size={14} />
         </button>
       </div>
 
-      {/* Staged */}
       {staged.length > 0 && (
         <div style={{ marginBottom: '12px' }}>
-          <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '6px', letterSpacing: '0.5px' }}>Staged</div>
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', marginBottom: '6px', letterSpacing: '0.5px' }}>Staged</div>
           {staged.map(f => (
-            <div key={f.path} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', fontSize: '12px', color: '#73c991' }}>
+            <div key={f.path} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', fontSize: '12px', color: 'var(--git-add)' }}>
               <Check size={14} />
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.path}</span>
             </div>
@@ -68,12 +66,11 @@ export function GitViewer({ path }: GitViewerProps) {
         </div>
       )}
 
-      {/* Unstaged */}
       {unstaged.length > 0 && (
         <div style={{ marginBottom: '12px' }}>
-          <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '6px', letterSpacing: '0.5px' }}>Changes</div>
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', marginBottom: '6px', letterSpacing: '0.5px' }}>Changes</div>
           {unstaged.map(f => (
-            <div key={f.path} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', fontSize: '12px', color: f.status === 'Deleted' ? '#f14c4c' : '#e2c08d' }}>
+            <div key={f.path} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 8px', fontSize: '12px', color: f.status === 'Deleted' ? 'var(--git-del)' : 'var(--git-mod)' }}>
               <AlertCircle size={14} />
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.path}</span>
             </div>
@@ -81,22 +78,21 @@ export function GitViewer({ path }: GitViewerProps) {
         </div>
       )}
 
-      {/* Commits */}
       <div>
-        <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '6px', letterSpacing: '0.5px' }}>Commits</div>
+        <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', marginBottom: '6px', letterSpacing: '0.5px' }}>Commits</div>
         {commits.map(c => (
-          <div key={c.hash} style={{ padding: '8px', marginBottom: '4px', backgroundColor: '#2a2a2a', borderRadius: '4px', cursor: 'pointer' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#333'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2a2a2a'}
+          <div key={c.hash} style={{ padding: '8px', marginBottom: '4px', backgroundColor: 'var(--bg-elevated)', borderRadius: '4px', cursor: 'pointer' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-elevated)'; }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-              <GitCommitIcon size={14} color="#5865f2" />
-              <span style={{ color: '#5865f2', fontSize: '11px', fontFamily: 'monospace' }}>{c.short_hash}</span>
+              <GitCommitIcon size={14} color="var(--accent)" />
+              <span style={{ color: 'var(--accent)', fontSize: '11px', fontFamily: 'monospace' }}>{c.short_hash}</span>
             </div>
-            <div style={{ color: '#d4d4d4', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '2px' }}>
+            <div style={{ color: 'var(--fg)', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '2px' }}>
               {c.message}
             </div>
-            <div style={{ color: '#666', fontSize: '10px' }}>{c.author} • {formatTime(c.time)}</div>
+            <div style={{ color: 'var(--fg-dim)', fontSize: '10px' }}>{c.author} • {formatTime(c.time)}</div>
           </div>
         ))}
       </div>

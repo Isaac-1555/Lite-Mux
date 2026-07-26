@@ -64,12 +64,12 @@ export function Sidebar({
 
   if (!open) {
     return (
-      <div style={{ width: '40px', backgroundColor: '#181818', borderRight: '1px solid #333', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '8px', gap: '4px' }}>
-        <button onClick={onToggle} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '8px' }}>
+      <div style={{ width: '40px', backgroundColor: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '8px', gap: '4px' }}>
+        <button onClick={onToggle} style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '8px' }}>
           <Menu size={18} />
         </button>
         {onOpenSettings && (
-          <button onClick={onOpenSettings} title="Keyboard Shortcuts" style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '8px' }}>
+          <button onClick={onOpenSettings} title="Settings" style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '8px' }}>
             <Settings size={18} />
           </button>
         )}
@@ -78,24 +78,22 @@ export function Sidebar({
   }
 
   return (
-    <div style={{ width: '250px', backgroundColor: '#181818', borderRight: '1px solid #333', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Header with toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '12px 12px 8px 12px', color: '#fff', borderBottom: '1px solid #333' }}>
+    <div style={{ width: '250px', backgroundColor: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', padding: '12px 12px 8px 12px', color: 'var(--fg-bright)', borderBottom: '1px solid var(--border)' }}>
         <span style={{ display: 'flex', alignItems: 'center', flex: 1, fontWeight: 'bold', fontFamily: '"JetBrains Mono", "SF Mono", Menlo, Monaco, monospace', fontSize: '15px', letterSpacing: '0.5px' }}>
           Tux
         </span>
         {onOpenSettings && (
-          <button onClick={onOpenSettings} title="Keyboard Shortcuts" style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px', display: 'inline-flex', alignItems: 'center' }}>
+          <button onClick={onOpenSettings} title="Settings" style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '4px', display: 'inline-flex', alignItems: 'center' }}>
             <Settings size={16} />
           </button>
         )}
-        <button onClick={onToggle} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px', display: 'inline-flex', alignItems: 'center' }}>
+        <button onClick={onToggle} style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '4px', display: 'inline-flex', alignItems: 'center' }}>
           <Menu size={16} />
         </button>
       </div>
 
-      {/* Tab icons */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
         {[
           { key: 'terminals', icon: Monitor, label: 'Terminals' },
           { key: 'explorer', icon: Folder, label: 'Explorer' },
@@ -107,10 +105,10 @@ export function Sidebar({
             style={{
               flex: 1,
               padding: '10px 0',
-              background: activeTab === key ? '#2a2a2a' : 'transparent',
+              background: activeTab === key ? 'var(--bg-elevated)' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === key ? '2px solid #5865f2' : '2px solid transparent',
-              color: activeTab === key ? '#fff' : '#888',
+              borderBottom: activeTab === key ? '2px solid var(--accent)' : '2px solid transparent',
+              color: activeTab === key ? 'var(--fg-bright)' : 'var(--fg-muted)',
               cursor: 'pointer',
               display: 'flex',
               justifyContent: 'center',
@@ -123,11 +121,10 @@ export function Sidebar({
         ))}
       </div>
 
-      {/* Tab content */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {activeTab === 'terminals' && (
           <div style={{ padding: '10px' }}>
-            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '8px', letterSpacing: '0.5px' }}>Sessions</div>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', marginBottom: '8px', letterSpacing: '0.5px' }}>Sessions</div>
             {terminals.map((t, idx) => (
               <div
                 key={t.id}
@@ -136,8 +133,8 @@ export function Sidebar({
                   padding: '8px 10px',
                   marginBottom: '4px',
                   borderRadius: '4px',
-                  backgroundColor: t.id === activeTerminalId ? '#5865f2' : '#2a2a2a',
-                  color: '#ccc',
+                  backgroundColor: t.id === activeTerminalId ? 'var(--accent)' : 'var(--bg-elevated)',
+                  color: 'var(--fg)',
                   fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
@@ -154,7 +151,7 @@ export function Sidebar({
                 </span>
                 <button
                   onClick={(e) => { e.stopPropagation(); onRemoveTerminal(t.id); }}
-                  style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '2px', display: 'flex', borderRadius: '2px' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '2px', display: 'flex', borderRadius: '2px' }}
                 >
                   <X size={14} />
                 </button>
@@ -162,7 +159,7 @@ export function Sidebar({
             ))}
             <button
               onClick={onAddTerminal}
-              style={{ marginTop: '10px', width: '100%', background: 'transparent', color: '#aaa', border: '1px dashed #555', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}
+              style={{ marginTop: '10px', width: '100%', background: 'transparent', color: 'var(--fg-muted)', border: '1px dashed var(--fg-faint)', padding: '6px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' }}
             >
               + New Terminal
             </button>
@@ -172,18 +169,18 @@ export function Sidebar({
         {activeTab === 'explorer' && (
           <div style={{ padding: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', letterSpacing: '0.5px' }}>Explorer</div>
+              <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', letterSpacing: '0.5px' }}>Explorer</div>
               <button
                 onClick={onToggleHiddenFiles}
-                style={{ background: 'transparent', border: 'none', color: showHiddenFiles ? '#5865f2' : '#666', cursor: 'pointer', padding: '2px' }}
+                style={{ background: 'transparent', border: 'none', color: showHiddenFiles ? 'var(--accent)' : 'var(--fg-dim)', cursor: 'pointer', padding: '2px' }}
                 title={showHiddenFiles ? 'Hide hidden files' : 'Show hidden files'}
               >
                 {showHiddenFiles ? <Eye size={14} /> : <EyeOff size={14} />}
               </button>
             </div>
-            <div style={{ fontSize: '11px', color: '#888', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={explorerRoot}>
+            <div style={{ fontSize: '11px', color: 'var(--fg-muted)', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={explorerRoot}>
               {explorerRoot.split('/').pop() || explorerRoot}
-              <span style={{ color: '#555', marginLeft: '4px' }}>{explorerRoot}</span>
+              <span style={{ color: 'var(--fg-faint)', marginLeft: '4px' }}>{explorerRoot}</span>
             </div>
             <FileTree
               nodes={explorerTree}

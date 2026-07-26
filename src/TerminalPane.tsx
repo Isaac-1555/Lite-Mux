@@ -8,12 +8,22 @@ import '@xterm/xterm/css/xterm.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { open } from '@tauri-apps/plugin-shell';
+import { type ThemeColors, toXtermTheme } from './theme';
 
-export function TerminalPane({ id, isVisible }: { id: string; isVisible: boolean }) {
+export function TerminalPane({
+  id,
+  isVisible,
+  colors,
+}: {
+  id: string;
+  isVisible: boolean;
+  colors: ThemeColors;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const colorsRef = useRef(colors);
   // Generation counter for React 19 StrictMode remount safety. Each effect
   // run captures `myGen = ++generationRef.current`. After any `await`, check
   // isStale() — if the effect re-ran (StrictMode dev) or unmounted, bail
@@ -41,6 +51,14 @@ export function TerminalPane({ id, isVisible }: { id: string; isVisible: boolean
       return () => clearTimeout(timer);
     }
   }, [isVisible, fitTerminal]);
+
+  // Live theme update — do not remount PTY
+  useEffect(() => {
+    colorsRef.current = colors;
+    const term = termRef.current;
+    if (!term) return;
+    term.options.theme = toXtermTheme(colors);
+  }, [colors]);
 
   useEffect(() => {
     const myGen = ++generationRef.current;
@@ -86,10 +104,7 @@ export function TerminalPane({ id, isVisible }: { id: string; isVisible: boolean
       const term = new Terminal({
         fontSize,
         fontFamily,
-        theme: {
-          background: '#1e1e1e',
-          foreground: '#d4d4d4',
-        },
+        theme: toXtermTheme(colorsRef.current),
       });
 
       term.open(el);

@@ -646,11 +646,12 @@ or
 # 13. Themes
 
 ## v1
-- dark mode only
-- minimal themes
+- Settings → Themes: presets (Catppuccin flavors, Everforest, Nord, Gruvbox dark/light, Tux Dark) + custom builder
+- Surfaces: app chrome (CSS vars), xterm ANSI palette, CodeMirror syntax, diff colors
+- Live preview + persist (`theme.json`)
 
 Potential:
-- Ghostty theme compatibility
+- Ghostty theme file import/export
 
 ---
 

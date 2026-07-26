@@ -1,20 +1,29 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import CodeMirror from '@uiw/react-codemirror';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { json } from '@codemirror/lang-json';
 import { markdown } from '@codemirror/lang-markdown';
+import { type ThemeColors, toCodeMirrorTheme } from './theme';
 
-export function EditorPane({ filePath, onClose }: { filePath: string; onClose: () => void }) {
+export function EditorPane({
+  filePath,
+  onClose,
+  colors,
+}: {
+  filePath: string;
+  onClose: () => void;
+  colors: ThemeColors;
+}) {
   const [content, setContent] = useState('');
   const [savedContent, setSavedContent] = useState('');
   const [loading, setLoading] = useState(true);
-  
+
   const isDirty = content !== savedContent;
   const autosaveTimeoutRef = useRef<number | null>(null);
+  const cmTheme = useMemo(() => toCodeMirrorTheme(colors), [colors]);
 
   useEffect(() => {
     async function loadFile() {
@@ -32,10 +41,6 @@ export function EditorPane({ filePath, onClose }: { filePath: string; onClose: (
     loadFile();
   }, [filePath]);
 
-  useEffect(() => {
-    // Dirty state no longer tracked in sidebar
-  }, [isDirty]);
-
   const handleSave = useCallback(async (textToSave: string) => {
     try {
       await invoke('write_file', { path: filePath, content: textToSave });
@@ -46,7 +51,6 @@ export function EditorPane({ filePath, onClose }: { filePath: string; onClose: (
     }
   }, [filePath]);
 
-  // Optional: Autosave after 2 seconds of inactivity
   useEffect(() => {
     if (!loading && isDirty) {
       if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
@@ -83,21 +87,21 @@ export function EditorPane({ filePath, onClose }: { filePath: string; onClose: (
     }
   };
 
-  if (loading) return <div style={{ padding: '20px', color: '#888' }}>Loading...</div>;
+  if (loading) return <div style={{ padding: '20px', color: 'var(--fg-muted)' }}>Loading...</div>;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }} onKeyDown={handleKeyDown}>
-      <div style={{ height: '30px', backgroundColor: '#252526', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: '12px', color: isDirty ? '#e2c08d' : '#888' }}>
+      <div style={{ height: '30px', backgroundColor: 'var(--bg-header)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: '12px', color: isDirty ? 'var(--git-mod)' : 'var(--fg-muted)' }}>
         <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {filePath} {isDirty && '•'}
         </span>
-        <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer' }}>×</button>
+        <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer' }}>×</button>
       </div>
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <CodeMirror
           value={content}
           height="100%"
-          theme={vscodeDark}
+          theme={cmTheme}
           extensions={getExtensions()}
           onChange={(val) => setContent(val)}
           basicSetup={{

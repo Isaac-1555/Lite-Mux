@@ -1,62 +1,10 @@
-.km-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.km-card {
-  width: 600px;
-  max-width: 90vw;
-  max-height: 80vh;
-  background: #252526;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
+.km-panel {
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  color: #cccccc;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
-}
-
-.km-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid #3c3c3c;
-}
-
-.km-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.km-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: transparent;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  border-radius: 4px;
-  padding: 0;
-}
-
-.km-icon-btn:hover {
-  background: #3c3c3c;
-  color: #fff;
+  color: var(--fg);
 }
 
 .km-search {
@@ -64,23 +12,24 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid #3c3c3c;
-  color: #888;
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--fg-muted);
+  flex-shrink: 0;
 }
 
 .km-search input {
   flex: 1;
-  background: #3c3c3c;
-  border: 1px solid #3c3c3c;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   padding: 6px 8px;
-  color: #fff;
+  color: var(--fg-bright);
   font-size: 13px;
   outline: none;
 }
 
 .km-search input:focus {
-  border-color: #007acc;
+  border-color: var(--accent);
 }
 
 .km-list {
@@ -99,7 +48,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #888;
+  color: var(--fg-muted);
 }
 
 .km-row {
@@ -112,7 +61,7 @@
 }
 
 .km-row:hover {
-  background: #2a2a2a;
+  background: var(--bg-elevated);
 }
 
 .km-row-label {
@@ -125,7 +74,7 @@
 
 .km-row-desc {
   font-size: 13px;
-  color: #cccccc;
+  color: var(--fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -134,7 +83,7 @@
 .km-reset-single {
   display: inline-flex;
   align-items: center;
-  color: #888;
+  color: var(--fg-muted);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.1s;
@@ -145,7 +94,7 @@
 }
 
 .km-reset-single:hover {
-  color: #fff;
+  color: var(--fg-bright);
 }
 
 .km-row-right {
@@ -159,12 +108,12 @@
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  background: #3c3c3c;
-  border: 1px solid #4c4c4c;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 12px;
-  color: #fff;
+  color: var(--fg-bright);
   min-width: 28px;
   justify-content: center;
   white-space: nowrap;
@@ -175,28 +124,28 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: #3c3c3c;
-  border: 1px solid #4c4c4c;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
-  color: #cccccc;
+  color: var(--fg);
   font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .km-btn:hover {
-  background: #4c4c4c;
-  color: #fff;
+  filter: brightness(1.1);
+  color: var(--fg-bright);
 }
 
 .km-btn-primary {
-  background: #0e639c;
-  border-color: #0e639c;
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
   color: #fff;
 }
 
 .km-btn-primary:hover {
-  background: #1177bb;
+  background: var(--btn-primary-hover);
 }
 
 .km-btn-ghost {
@@ -205,27 +154,27 @@
 }
 
 .km-btn-ghost:hover {
-  background: #3c3c3c;
+  background: var(--bg-elevated);
 }
 
 .km-btn-danger {
-  background: #a12628;
-  border-color: #a12628;
+  background: var(--danger);
+  border-color: var(--danger);
   color: #fff;
 }
 
 .km-btn-danger:hover {
-  background: #c4353a;
+  background: var(--danger-hover);
 }
 
 .km-btn-record {
   background: transparent;
-  border-color: #4c4c4c;
+  border-color: var(--border-strong);
 }
 
 .km-recording {
   font-size: 12px;
-  color: #f3c03c;
+  color: var(--warn);
   font-style: italic;
   animation: km-pulse 1.2s ease-in-out infinite;
 }
@@ -247,7 +196,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #f3c03c;
+  color: var(--warn);
 }
 
 .km-conflict-actions {
@@ -255,17 +204,17 @@
   gap: 6px;
 }
 
-.km-footer {
+.km-panel-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 10px 16px;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--border-strong);
+  flex-shrink: 0;
 }
 
 .km-empty {
   padding: 20px 16px;
   text-align: center;
   font-size: 13px;
-  color: #888;
+  color: var(--fg-muted);
 }

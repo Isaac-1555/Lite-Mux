@@ -12,14 +12,17 @@ interface FileTreeProps {
 
 export function FileTree({ nodes, expandedFolders, onToggle, onFileClick, gitStatus, showHiddenFiles = false }: FileTreeProps) {
   const renderNode = (node: FileNode, depth: number = 0) => {
-    // Skip hidden files if showHiddenFiles is false
     if (!showHiddenFiles && node.name.startsWith('.')) {
       return null;
     }
 
     const isExpanded = expandedFolders.has(node.path);
     const status = gitStatus[node.name];
-    const statusColor = status === 'Added' ? '#73c991' : status === 'Modified' ? '#e2c08d' : status === 'Deleted' ? '#f14c4c' : '#d4d4d4';
+    const statusColor =
+      status === 'Added' ? 'var(--git-add)'
+      : status === 'Modified' ? 'var(--git-mod)'
+      : status === 'Deleted' ? 'var(--git-del)'
+      : 'var(--fg)';
 
     return (
       <div key={node.path}>
@@ -37,12 +40,12 @@ export function FileTree({ nodes, expandedFolders, onToggle, onFileClick, gitSta
             padding: '4px 0',
             paddingLeft: `${depth * 16 + 8}px`,
             fontSize: '13px',
-            color: node.is_dir ? '#d4d4d4' : statusColor,
+            color: node.is_dir ? 'var(--fg)' : statusColor,
             cursor: 'pointer',
             borderRadius: '2px',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2a2d2e'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           {node.is_dir ? (
             <>
@@ -52,9 +55,9 @@ export function FileTree({ nodes, expandedFolders, onToggle, onFileClick, gitSta
                 <ChevronRight size={16} style={{ marginRight: '4px', flexShrink: 0 }} />
               )}
               {isExpanded ? (
-                <FolderOpen size={16} style={{ marginRight: '6px', color: '#dcb67a', flexShrink: 0 }} />
+                <FolderOpen size={16} style={{ marginRight: '6px', color: 'var(--folder)', flexShrink: 0 }} />
               ) : (
-                <Folder size={16} style={{ marginRight: '6px', color: '#dcb67a', flexShrink: 0 }} />
+                <Folder size={16} style={{ marginRight: '6px', color: 'var(--folder)', flexShrink: 0 }} />
               )}
             </>
           ) : (
@@ -81,7 +84,6 @@ export function FileTree({ nodes, expandedFolders, onToggle, onFileClick, gitSta
     );
   };
 
-  // Filter root level nodes if needed
   const filteredNodes = showHiddenFiles ? nodes : nodes.filter(node => !node.name.startsWith('.'));
 
   return <div style={{ padding: '4px 0' }}>{filteredNodes.map(node => renderNode(node))}</div>;

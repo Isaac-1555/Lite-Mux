@@ -14,12 +14,15 @@ src/                            # React frontend
 ├── Sidebar.tsx                 # Tabs: terminals / explorer / git; settings button
 ├── TerminalPane.tsx            # xterm.js + PTY lifecycle; StrictMode generation counter
 ├── EditorPane.tsx              # CodeMirror
-├── DiffPane.tsx                # @pierre/diffs viewer
+├── DiffPane.tsx                # Diff viewer (CSS vars)
 ├── FileTree.tsx                # Folder tree with git status overlays
 ├── GitViewer.tsx               # Branch, status, commits
-├── KeymapSettings.tsx          # Modal: rebind shortcuts, conflict detection
+├── SettingsModal.tsx           # Settings shell: Keyboard | Themes
+├── KeymapSettings.tsx          # KeymapPanel (embedded)
+├── ThemeSettings.tsx           # Presets + custom builder
 ├── keymap.ts                   # DEFAULT_KEYMAP, types, match/format/findConflict
 ├── keymapStorage.ts            # plugin-store persistence for KeymapOverride
+├── theme/                      # tokens, presets, apply, xterm/CM, storage
 └── types.ts                    # FileNode, GitFileStatus, TerminalMeta
 
 src-tauri/                      # Rust backend
@@ -75,7 +78,7 @@ Frontend ↔ backend over Tauri's `invoke()` (request/response) and `listen()` (
 1. User creates terminal → `App.tsx` adds `{id}` to `terminals` state → `TerminalPane` mounts → xterm opens → `invoke('spawn_pty', {id, rows, cols})`.
 2. Rust spawns PTY (login shell), starts reader thread. Reader emits `pty-data-{id}` for raw bytes (OSC 7999 stripped); metadata poller emits `pty-cmd-changed-{id}` and `pty-meta-changed-{id}` on tick.
 3. Frontend `App.tsx` updates `terminalMeta[id]` from these events. Sidebar reads `terminalMeta[activeTerminalId]` for tab labels. Explorer syncs root to `terminalMeta[activeTerminalId].cwd`.
-4. Persistence: `terminals` and `keymapOverrides` save to plugin-store on change. Window state saved by `tauri-plugin-window-state` independently.
+4. Persistence: `terminals`, `keymapOverrides`, and theme save to plugin-store on change. Window state saved by `tauri-plugin-window-state` independently.
 
 ### Store schema
 
@@ -84,7 +87,8 @@ Frontend ↔ backend over Tauri's `invoke()` (request/response) and `listen()` (
 | Key | Type | Notes |
 |---|---|---|
 | `terminals` | `Array<{id: string}>` | One entry per session. Cwd not stored — recovered on relaunch via `get_pty_cwd` (PTY survives relaunch if Rust process is alive; otherwise spawn fresh). |
-| *(reserved for keymap)* | `KeymapOverride` | See `keymapStorage.ts` for current key name. |
+
+`keymap.json` — keymap overrides. `theme.json` — `{ activeId, custom }` theme state.
 
 Window size + maximized state: separate file managed by `tauri-plugin-window-state`. Do not duplicate in plugin-store.
 
@@ -94,8 +98,9 @@ Window size + maximized state: separate file managed by `tauri-plugin-window-sta
 - **Frontend state** lives in `App.tsx` (root). Components receive props, hold no internal global state. Persistence via `@tauri-apps/plugin-store`.
 - **TypeScript types** for Tauri payloads: `src/types.ts`.
 - **Icons:** `lucide-react`. No other icon lib.
-- **Editor:** `@uiw/react-codemirror` + `@codemirror/lang-*` packages. Theme: `vscode` from `@uiw/codemirror-theme-vscode`.
-- **Styling:** inline `style={{}}` props + `App.css` / `index.css`. No Tailwind, no CSS-in-JS lib.
+- **Editor:** `@uiw/react-codemirror` + `@codemirror/lang-*`. Theme built via `toCodeMirrorTheme()` (`@uiw/codemirror-themes`) from active `ThemeColors`.
+- **Styling:** CSS vars (`--bg-app`, `--fg`, `--accent`, …) set by `applyTheme()`; inline styles use `var(--…)`. No Tailwind, no CSS-in-JS lib.
+- **Themes:** `src/theme/` — presets (Catppuccin, Everforest, Nord, Gruvbox, Tux Dark) + custom builder. Persist `theme.json` via plugin-store. Live apply.
 - **Crate names:** main = `tux`, lib = `tux_lib`. Rust code uses `tux_lib::…`.
 - **Tauri identifier:** `dev.tux.app`. Don't change without intent.
 - **React 19 + `@tauri-apps/api` 2.x:** use `invoke` from `@tauri-apps/api/core` (not the deprecated `@tauri-apps/api/tauri`).
@@ -130,7 +135,7 @@ All shortcuts are **data-driven**. Source of truth: `DEFAULT_KEYMAP` in `src/key
 - `@xterm/addon-image` — SIXEL / iTerm2 IIP / kitty TGP. Programs that detect image capability render inline graphics.
 - `@xterm/addon-web-links` — clickable URLs, opens via `@tauri-apps/plugin-shell`'s `open()`.
 
-Theme: hardcoded dark (`#1e1e1e` background, `#d4d4d4` foreground). Font: Monaco/Menlo/Courier stack at 14px. No theme system yet.
+Theme: from `ThemeColors` via `toXtermTheme()` (bg/fg/cursor/selection + 16 ANSI). Font: Monaco/Menlo/Courier stack at 14px.
 
 ## Gotchas
 
