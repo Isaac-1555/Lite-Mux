@@ -31,6 +31,7 @@ export type GitBranch = {
 
 export type TerminalSession = {
   id: string;
+  cwd?: string;
 };
 
 export type TerminalMeta = {

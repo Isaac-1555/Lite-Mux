@@ -28,7 +28,7 @@ let storeInstance: any = null;
 
 function App() {
   const [loaded, setLoaded] = useState(false);
-  const [terminals, setTerminals] = useState<{ id: string }[]>([]);
+  const [terminals, setTerminals] = useState<{ id: string; cwd?: string }[]>([]);
   const [activeTerminalId, setActiveTerminalId] = useState<string | null>(null);
   const [editorFile, setEditorFile] = useState<string | null>(null);
 
@@ -93,6 +93,7 @@ function App() {
   // Load initial state
   useEffect(() => {
     async function loadState() {
+      let initialRoot = '/Users/user';
       try {
         if (!storeInstance) {
           storeInstance = await load('workspace.json');
@@ -101,6 +102,17 @@ function App() {
         if (savedTerminals && Array.isArray(savedTerminals) && savedTerminals.length > 0) {
           setTerminals(savedTerminals);
           setActiveTerminalId(savedTerminals[0].id);
+          const cwds: Record<string, string> = {};
+          for (const t of savedTerminals) {
+            if (t && typeof t.id === 'string' && typeof t.cwd === 'string') {
+              cwds[t.id] = t.cwd;
+            }
+          }
+          setPendingCwd(cwds);
+          if (typeof savedTerminals[0].cwd === 'string') {
+            initialRoot = savedTerminals[0].cwd;
+            setExplorerRoot(initialRoot);
+          }
         } else {
           const newTerm = { id: `term-${Date.now()}` };
           setTerminals([newTerm]);
@@ -113,9 +125,9 @@ function App() {
         setActiveTerminalId(newTerm.id);
       }
 
-      // Load explorer tree (default /Users/user)
+      // Load explorer tree (default /Users/user or restored cwd)
       try {
-        const res = await invoke<FileNode[]>('read_dir', { path: '/Users/user' });
+        const res = await invoke<FileNode[]>('read_dir', { path: initialRoot });
         setExplorerTree(res);
       } catch (e) {
         console.error("Failed to read dir", e);
@@ -269,13 +281,14 @@ function App() {
     };
   }, [loaded, terminals, activeTerminalId]);
 
-  // Save terminals state
+  // Save terminals state (with last known cwd per terminal)
   useEffect(() => {
     if (!loaded || !storeInstance) return;
-    storeInstance.set('terminals', terminals)
+    const toSave = terminals.map(t => ({ id: t.id, cwd: terminalMeta[t.id]?.cwd }));
+    storeInstance.set('terminals', toSave)
       .then(() => storeInstance.save())
       .catch((e: any) => console.error("Failed to save state", e));
-  }, [terminals, loaded]);
+  }, [terminals, terminalMeta, loaded]);
 
   const addTerminal = () => {
     const newTerm = { id: `term-${Date.now()}` };
