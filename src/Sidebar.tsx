@@ -1,4 +1,4 @@
-import { Monitor, Folder, GitBranch, Menu, Eye, EyeOff, X, Settings } from 'lucide-react';
+import { Monitor, Folder, GitBranch, Menu, Eye, EyeOff, X, Plus, Settings } from 'lucide-react';
 import { FileTree } from './FileTree';
 import { GitViewer } from './GitViewer';
 import type { FileNode, TerminalMeta } from './types';
@@ -13,6 +13,7 @@ interface SidebarProps {
   activeTerminalCwd: string | null;
   onTerminalSelect: (id: string) => void;
   onAddTerminal: () => void;
+  onAddTerminalInCwd: (cwd?: string) => void;
   onRemoveTerminal: (id: string) => void;
   explorerTree: FileNode[];
   explorerRoot: string;
@@ -36,6 +37,7 @@ export function Sidebar({
   activeTerminalCwd,
   onTerminalSelect,
   onAddTerminal,
+  onAddTerminalInCwd,
   onRemoveTerminal,
   explorerTree,
   explorerRoot,
@@ -149,12 +151,21 @@ export function Sidebar({
                     {getTerminalDisplayName(t.id, idx)}
                   </span>
                 </span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onRemoveTerminal(t.id); }}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '2px', display: 'flex', borderRadius: '2px' }}
-                >
-                  <X size={14} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onAddTerminalInCwd(terminalMeta[t.id]?.cwd); }}
+                    title="New terminal in this directory"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '2px', display: 'flex', borderRadius: '2px' }}
+                  >
+                    <Plus size={14} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onRemoveTerminal(t.id); }}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--fg-muted)', cursor: 'pointer', padding: '2px', display: 'flex', borderRadius: '2px' }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
               </div>
             ))}
             <button

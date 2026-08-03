@@ -44,6 +44,10 @@ function App() {
   // Terminal metadata: { cwd, processName, gitBranch, currentCommand }
   const [terminalMeta, setTerminalMeta] = useState<Record<string, TerminalMeta>>({});
 
+  // Transient spawn directory for terminals created via the sidebar "+" button.
+  // Not persisted: cwd is intentionally absent from the workspace.json schema.
+  const [pendingCwd, setPendingCwd] = useState<Record<string, string>>({});
+
   // Resizable split: fraction of width for the left (editor) pane
   const [splitRatio, setSplitRatio] = useState(0.5);
   const splitContainerRef = useRef<HTMLDivElement>(null);
@@ -279,6 +283,15 @@ function App() {
     setActiveTerminalId(newTerm.id);
   };
 
+  const addTerminalInCwd = (cwd?: string) => {
+    const newTerm = { id: `term-${Date.now()}` };
+    setTerminals(prev => [...prev, newTerm]);
+    setActiveTerminalId(newTerm.id);
+    if (cwd) {
+      setPendingCwd(prev => ({ ...prev, [newTerm.id]: cwd }));
+    }
+  };
+
   // Global keyboard shortcuts - capture phase so terminal focus doesn't swallow them
   const effectiveKeyEntries = useMemo(() => effectiveKeymap(keymapOverrides), [keymapOverrides]);
 
@@ -368,6 +381,11 @@ function App() {
       delete next[id];
       return next;
     });
+    setPendingCwd(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   };
 
   const openFile = (path: string) => {
@@ -438,6 +456,7 @@ function App() {
         activeTerminalCwd={activeTerminalId ? terminalMeta[activeTerminalId]?.cwd ?? null : null}
         onTerminalSelect={setActiveTerminalId}
         onAddTerminal={addTerminal}
+        onAddTerminalInCwd={addTerminalInCwd}
         onRemoveTerminal={removeTerminal}
         explorerTree={explorerTree}
         explorerRoot={explorerRoot}
@@ -549,7 +568,7 @@ function App() {
               >
                 <TerminalHeader id={t.id} index={idx} onRemove={removeTerminal} meta={terminalMeta[t.id]} />
                 <div style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                  <TerminalPane id={t.id} isVisible={t.id === activeTerminalId} colors={themeColors} />
+                  <TerminalPane id={t.id} isVisible={t.id === activeTerminalId} colors={themeColors} initialCwd={pendingCwd[t.id]} />
                 </div>
               </div>
             ))}

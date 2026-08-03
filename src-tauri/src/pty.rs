@@ -349,7 +349,7 @@ fn write_init_script(kind: ShellKind) -> Result<InitArtifacts, String> {
 }
 
 #[tauri::command]
-pub fn spawn_pty(id: String, rows: u16, cols: u16, app_handle: AppHandle) -> Result<(), String> {
+pub fn spawn_pty(id: String, rows: u16, cols: u16, cwd: Option<String>, app_handle: AppHandle) -> Result<(), String> {
     let pty_system = NativePtySystem::default();
     let pair = pty_system.openpty(PtySize {
         rows,
@@ -427,6 +427,10 @@ pub fn spawn_pty(id: String, rows: u16, cols: u16, app_handle: AppHandle) -> Res
         }
     }
 
+    if let Some(dir) = &cwd {
+        cmd.cwd(dir);
+    }
+
     let child = pair.slave.spawn_command(cmd).map_err(|e| e.to_string())?;
     let child_pid = child.process_id();
     drop(pair.slave);
@@ -437,7 +441,7 @@ pub fn spawn_pty(id: String, rows: u16, cols: u16, app_handle: AppHandle) -> Res
     let home_dir = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let default_name = shell_name.rsplit('/').next().unwrap_or(&shell_name).to_string();
 
-    let cwd: Arc<Mutex<String>> = Arc::new(Mutex::new(home_dir));
+    let cwd: Arc<Mutex<String>> = Arc::new(Mutex::new(cwd.unwrap_or(home_dir)));
     let process_name: Arc<Mutex<String>> = Arc::new(Mutex::new(default_name.clone()));
     let git_branch: Arc<Mutex<Option<String>>> = Arc::new(Mutex::new(None));
     let current_command: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));

@@ -14,10 +14,12 @@ export function TerminalPane({
   id,
   isVisible,
   colors,
+  initialCwd,
 }: {
   id: string;
   isVisible: boolean;
   colors: ThemeColors;
+  initialCwd?: string;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const termRef = useRef<Terminal | null>(null);
@@ -215,7 +217,7 @@ export function TerminalPane({
       });
 
       // Request PTY spawn
-      await invoke('spawn_pty', { id, rows: term.rows, cols: term.cols });
+      await invoke('spawn_pty', { id, rows: term.rows, cols: term.cols, cwd: initialCwd });
 
       // StrictMode guard: if the effect re-ran during the await, the new
       // mount will spawn its own PTY. We don't close here — calling
@@ -264,7 +266,7 @@ export function TerminalPane({
       termRef.current = null;
       fitAddonRef.current = null;
     };
-  }, [id, fitTerminal]);
+  }, [id, fitTerminal, initialCwd]);
 
   return (
     <>
