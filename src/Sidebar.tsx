@@ -1,4 +1,4 @@
-import { Monitor, Folder, GitBranch, Menu, Eye, EyeOff, X, Plus, Settings } from 'lucide-react';
+import { Monitor, Folder, GitBranch, Menu, Eye, EyeOff, X, Plus, Settings, RefreshCw } from 'lucide-react';
 import { FileTree } from './FileTree';
 import { GitViewer } from './GitViewer';
 import type { FileNode, TerminalMeta } from './types';
@@ -24,6 +24,7 @@ interface SidebarProps {
   terminalMeta: Record<string, TerminalMeta>;
   showHiddenFiles: boolean;
   onToggleHiddenFiles: () => void;
+  onRefreshExplorer: () => void;
   onOpenSettings?: () => void;
 }
 
@@ -48,6 +49,7 @@ export function Sidebar({
   terminalMeta,
   showHiddenFiles,
   onToggleHiddenFiles,
+  onRefreshExplorer,
   onOpenSettings,
 }: SidebarProps) {
   const getTerminalDisplayName = (id: string, index: number): string => {
@@ -181,13 +183,22 @@ export function Sidebar({
           <div style={{ padding: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
               <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--fg-dim)', letterSpacing: '0.5px' }}>Explorer</div>
-              <button
-                onClick={onToggleHiddenFiles}
-                style={{ background: 'transparent', border: 'none', color: showHiddenFiles ? 'var(--accent)' : 'var(--fg-dim)', cursor: 'pointer', padding: '2px' }}
-                title={showHiddenFiles ? 'Hide hidden files' : 'Show hidden files'}
-              >
-                {showHiddenFiles ? <Eye size={14} /> : <EyeOff size={14} />}
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <button
+                  onClick={onRefreshExplorer}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--fg-dim)', cursor: 'pointer', padding: '2px' }}
+                  title="Refresh"
+                >
+                  <RefreshCw size={14} />
+                </button>
+                <button
+                  onClick={onToggleHiddenFiles}
+                  style={{ background: 'transparent', border: 'none', color: showHiddenFiles ? 'var(--accent)' : 'var(--fg-dim)', cursor: 'pointer', padding: '2px' }}
+                  title={showHiddenFiles ? 'Hide hidden files' : 'Show hidden files'}
+                >
+                  {showHiddenFiles ? <Eye size={14} /> : <EyeOff size={14} />}
+                </button>
+              </div>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--fg-muted)', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={explorerRoot}>
               {explorerRoot.split('/').pop() || explorerRoot}

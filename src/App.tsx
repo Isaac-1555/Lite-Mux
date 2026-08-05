@@ -414,6 +414,21 @@ function App() {
     setDiffFile(null);
   };
 
+  const refreshExplorer = () => {
+    invoke<FileNode[]>('read_dir', { path: explorerRoot }).then(setExplorerTree).catch(console.error);
+    setExpandedFolders(new Set());
+    invoke<GitFileStatus[]>('get_git_status', { path: explorerRoot })
+      .then(gitRes => {
+        const statusMap: Record<string, string> = {};
+        for (const status of gitRes) {
+          const parts = status.path.split('/');
+          statusMap[parts[parts.length - 1]] = status.status;
+        }
+        setGitStatus(statusMap);
+      })
+      .catch(() => setGitStatus({}));
+  };
+
   const handleToggleFolder = async (path: string) => {
     setExpandedFolders(prev => {
       const newSet = new Set(prev);
@@ -480,6 +495,7 @@ function App() {
         terminalMeta={terminalMeta}
         showHiddenFiles={showHiddenFiles}
         onToggleHiddenFiles={() => setShowHiddenFiles(prev => !prev)}
+        onRefreshExplorer={refreshExplorer}
         onOpenSettings={() => setShowSettings(true)}
       />
 
